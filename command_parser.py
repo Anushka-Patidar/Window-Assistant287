@@ -26,3 +26,35 @@ flattened_dict = {} # verb resolution table
 for key, synonyms_list in ACTION_SYNONYMS.items():
     for synonym in synonyms_list:
         flattened_dict[synonym] = key
+
+# target positional/lookup dictionary
+ACTION_TARGET_MODE = {
+    "increase_brightness": "lookup",
+    "decrease_brightness": "lookup",
+    "set_brightness":      "lookup",
+    "increase_volume":     "lookup",
+    "decrease_volume":     "lookup",
+    "set_volume":          "lookup",
+    "mute_volume":         "lookup",
+    "open_application":    "positional",
+    "close_application":   "positional",
+    "increase_zoom":       "lookup",
+    "decrease_zoom":       "lookup",
+    "lock_screen":         "none",
+    "shutdown":            "none",
+    "restart":             "none",
+}
+
+def command_parser(tokens: list):
+    for i, token in enumerate(tokens):
+        if token in flattened_dict:
+            action = flattened_dict[token]
+            break
+    
+    KNOWN_TARGETS = ["brightness", "volume", "zoom"]
+    if ACTION_TARGET_MODE[action] == "lookup":
+        for token in tokens:
+            if token in KNOWN_TARGETS:
+                target = token
+    elif ACTION_TARGET_MODE[action] == "positional":
+        target = tokens[i+1]
