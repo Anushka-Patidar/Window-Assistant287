@@ -98,9 +98,10 @@ def command_parser(tokens: list) -> CommandIR:
                         target = tokens[i+1]
                         target_found = True
                     else:
-                        command_ir.action = verb
+                        command_ir.action = verb + "_application"
                         command_ir.errors.append("No target application provided!")
                         return command_ir
+                    continue
 
             if token in flattened_target_dict:
                 target = flattened_target_dict[token]
@@ -128,7 +129,7 @@ def command_parser(tokens: list) -> CommandIR:
     
     # finding parameters, if any
     for token in tokens:
-        if token.isdigit(): # only for integers
-            command_ir.parameters["level"] = int(token)
+        if isinstance(token, int): # only for integers
+            command_ir.parameters["level"] = token
 
     return command_ir
