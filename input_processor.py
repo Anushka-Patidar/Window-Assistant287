@@ -1,4 +1,5 @@
 import string
+import re
 
 # singular numbers list
 singular_nums = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
@@ -38,7 +39,7 @@ word_to_num = {
 
 def input_processor(command: str) -> list:
     text = command.lower()  # lower-case it all
-    text = text.translate(str.maketrans("", "", string.punctuation))   # remove all punctuation with ""
+    text = re.sub(r'(?!-\d)[!"#$%&\'()*+,\-./:;<=>?@\[\\\]^_`{|}~]', "", text)   # remove all punctuation with ""
 
     if not text:
         return []
@@ -59,7 +60,7 @@ def input_processor(command: str) -> list:
                 tokens.pop(i+1)
             tokens[i] = word_to_num[tokens[i]]  # str to num conversion
             # break
-        elif current.isdigit():
+        elif current.lstrip("-").isdigit():
             tokens[i] = int(current)
         i += 1
 
