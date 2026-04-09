@@ -95,7 +95,7 @@ def command_parser(tokens: list) -> CommandIR:
                 # open action command
                 if verb == 'open' or verb == 'close':
                     if (i+1) < len(tokens):
-                        target = tokens[i+1]
+                        target = " ".join(tokens[i+1:])
                         target_found = True
                     else:
                         command_ir.action = verb + "_application"
@@ -128,8 +128,12 @@ def command_parser(tokens: list) -> CommandIR:
         command_ir.target = target
     
     # finding parameters, if any
-    for token in tokens:
+    for i, token in enumerate(tokens):
         if isinstance(token, int): # only for integers
             command_ir.parameters["level"] = token
+
+            # checking for 'minus' in words
+            if i > 0 and tokens[i-1] == "minus":
+                command_ir.parameters["level"] = 0 - token
 
     return command_ir

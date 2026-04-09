@@ -7,15 +7,15 @@ command = input("Enter your command: ")
 
 # input processing
 tokens = input_processor(command)
-# print("Tokens generated: ", tokens)
+print("Tokens generated: ", tokens)
 
 # parsing through the tokens and producing an intermediate representation
 ir = command_parser(tokens)
-# print("The output is as follows:\n", ir)
+print("The output is as follows:\n", ir)
 
 # validating the ir
 ir = validator(ir)
-# print("Validated ir is:", ir)
+print("Validated ir is:", ir)
 
 # error correction
 if not ir.errors:   # empty list
