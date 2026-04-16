@@ -1,6 +1,7 @@
 from input_processor import input_processor
 from command_parser import command_parser
 from validator import validator
+from executor import execution
 
 # taking in user input
 command = input("Enter your command: ")
@@ -30,7 +31,9 @@ if not ir.errors:   # empty list
         else:
             print("Warning Encountered:", ir.warnings[0])
     
-    # call executor
+    # execution
+    execution(ir)
+    
 else:
     if len(ir.errors) > 1:
         print("Error Encountered!")
