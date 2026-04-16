@@ -1,14 +1,16 @@
 import string
-import re
+import re       # for regular expression to exclude right punctuation marks
 
 # singular numbers list
 singular_nums = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
                 "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen",
                 "sixteen", "seventeen", "eighteen", "nineteen", "hundred"]
 
+# possible number words that may have a follow up
 possible_double_nums = ["twenty", "thirty", "forty", "fifty", "sixty",
                         "seventy", "eighty", "ninety"]
 
+# for numbers in str to int type
 word_to_num = {
     "one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
     "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10,
@@ -39,29 +41,42 @@ word_to_num = {
 
 def input_processor(command: str) -> list:
     text = command.lower()  # lower-case it all
-    text = re.sub(r'(?!-\d)[!"#$%&\'()*+,\-./:;<=>?@\[\\\]^_`{|}~]', "", text)   # remove all punctuation with ""
 
+    # remove all punctuation with ""
+    # but keep the ones where dash (-) is followed by a digits
+    text = re.sub(r'(?!-\d)[!"#$%&\'()*+,\-./:;<=>?@\[\\\]^_`{|}~]', "", text)   
     if not text:
-        return []
+        return []       # i.e., empty command
 
     # tokenization
-    tokens = text.split()
+    tokens = text.strip().split()
 
     # numeral combination
     i = 0
     while i < len(tokens):    # numbers can be at any place
         current = tokens[i]
+
+        # token is a word for numbers 0 to 9
         if current in singular_nums:
-            tokens[i] = word_to_num[current]
-            # break # continuing through whole!
+            tokens[i] = word_to_num[current]    # replace with int
+            # NO break # continuing through whole!
+
+        # for either multiples of ten or double-letter numbers from them
         elif current in possible_double_nums:
+
+            # next token a numeric word too
             if (i+1) < len(tokens) and tokens[i+1] in singular_nums:
-                tokens[i] = current + " " + tokens[i+1]
-                tokens.pop(i+1)
-            tokens[i] = word_to_num[tokens[i]]  # str to num conversion
-            # break
+                tokens[i] = current + " " + tokens[i+1]     # make the double letter word
+                tokens.pop(i+1)     # complete numeric word obtained, so delete the second part
+            # str to num conversion
+            tokens[i] = word_to_num[tokens[i]]  
+            
+        # if of the for [0-9]* or -[0-9]* , i.e., negative or positive numeric
+        # digits itself, convert string to int
         elif current.lstrip("-").isdigit():
             tokens[i] = int(current)
+        
+        # increment index for next token
         i += 1
 
     return tokens

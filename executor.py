@@ -1,6 +1,10 @@
 from command_ir import CommandIR
+# importing action function files
 import shutdown_restart_lock 
 
+
+# maps action -> action's functions and the necessary list of parameters
+# both available in CommandIR object
 dispatch = {
     "shutdown":             (shutdown_restart_lock.shutdown,              []),
     "restart":              (shutdown_restart_lock.restart,               []),

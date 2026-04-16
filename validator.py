@@ -1,18 +1,22 @@
 from command_ir import CommandIR
 import shutil
 
+# actions involving the parameter: level
 LEVEL_ACTIONS = {
     "increase_brightness", "decrease_brightness", "set_brightness",
     "increase_volume", "decrease_volume", "set_volume",
     "increase_zoom", "decrease_zoom", "set_zoom"
 }
 
+
+
+# actions involving dealing with applications
 APPLICATION_ACTIONS = {
     "open_application",
     "close_application"
 }
 
-# url sites to check for browser
+# url sites to check for browser (when not in app_list of the system)
 URL_TARGETS = {
 
     # ── Search Engines ──────────────────────────────────────────────────────────
@@ -378,7 +382,7 @@ URL_TARGETS = {
 # default browser
 DEFAULT_BROWSER = "chrome"
 
-# application executable name resolution
+# varied name resolution for application -> executable names
 APP_TARGETS = {
 
     # ── Browsers ────────────────────────────────────────────────────────────────
@@ -518,21 +522,28 @@ APP_TARGETS = {
     "tableplus":            "tableplus",
 }
 
+
+
 def validator(command_ir: CommandIR) -> CommandIR:
 
     # validating 'level' parameter
     if command_ir.action in LEVEL_ACTIONS:
-        level = command_ir.parameters.get("level")
+        level = command_ir.parameters.get("level")      # safe getter: returns None if no such element found
 
+        # level parameter doesn't exists: get("level") returned None
         if level is None: 
-            # setting default level, if not
+            # setting a default level 
             command_ir.parameters["level"] = 50
             command_ir.warnings.append("No level provided. Defaulted to 50.")
+        
+        # level parameter present!
         else:
+
             # capping down level beyond 100
             if level > 100:
                 command_ir.parameters["level"] = 100
                 command_ir.warnings.append("Level provided greater than 100. Capped down to 100.")
+            
             # if level less than 0, setting it to minimum == 0
             if level < 0:
                 command_ir.parameters["level"] = 0
@@ -541,17 +552,21 @@ def validator(command_ir: CommandIR) -> CommandIR:
     # checking application validness
     target = command_ir.target
     if command_ir.action in APPLICATION_ACTIONS and target is not None:
-        if shutil.which(target) is None:
-            # checking for different executable file name
-            if target in APP_TARGETS:
-                command_ir.target = APP_TARGETS[target]
-            
-            if shutil.which(command_ir.target) is None:
-                if target in URL_TARGETS:
-                    command_ir.target = DEFAULT_BROWSER
-                    command_ir.parameters["url"] = URL_TARGETS[target]
-                    command_ir.warnings.append("No such application on system. Opening in Web!")
-                else:  
-                    command_ir.errors.append("Target not found on the system!")
+        
+        # correcting the application name if not == executable name
+        if target in APP_TARGETS:
+            command_ir.target = APP_TARGETS[target]
+            target = command_ir.target
+
+        # checking in system's application list
+        if shutil.which(target) is None:        # returns complete path or None (if doesn't exist)
+            if target in URL_TARGETS:       # target is a possible website
+                # open default browser
+                command_ir.target = DEFAULT_BROWSER
+                # open particular url in it
+                command_ir.parameters["url"] = URL_TARGETS[target]
+                command_ir.warnings.append("No such application on system. Opening in Browser!")
+            else:       # target not an application or a website: ERROR  
+                command_ir.errors.append("Target not found on the system!")
 
     return command_ir

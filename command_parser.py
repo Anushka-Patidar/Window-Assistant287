@@ -1,6 +1,7 @@
 from command_ir import CommandIR    # class object to be returned
 
-# verb resolution map
+# verb resolution map: technical-defined word from many synonyms
+#  verb -> tokens list structure
 VERB_SYNONYMS = {
     "increase": ["increase", "raise", "boost", "brighten", "higher", "more", "enhance", "intensify", "amplify", "elevate", "heighten", "crank", "bump", "louder", "enlarge", "magnify", "expand", "grow"],
     "decrease": ["decrease", "lower", "reduce", "dim", "less", "soften", "minimize", "darken", "drop", "shrink", "tone", "weaken", "fade", "cut", "quieter"],
@@ -17,20 +18,21 @@ for key, synonyms_list in VERB_SYNONYMS.items():
     for synonym in synonyms_list:
         flattened_verb_dict[synonym] = key
 
-# target resolution table
+# target resolution table: technological word for target from many synonyms
+# target -> synonyms list
 TARGET_SYNONYMS = {
     "brightness": ["brightness", "bright", "screen", "display", "backlight", "luminance", "glow"],
     "volume":     ["volume", "sound", "audio", "noise", "speaker", "music"],
     "zoom":       ["zoom", "scale", "magnification", "size"],
 }
 
-# flattened disk: synonym -> target
+# flattened dict: synonym -> target
 flattened_target_dict = {}
 for key, synonyms_list in TARGET_SYNONYMS.items():
     for synonym in synonyms_list:
         flattened_target_dict[synonym] = key
 
-# no target required verbs
+# verbs requiring no target. already complete
 STANDALONE_ACTIONS = {
     "shutdown":  "shutdown",
     "off":       "shutdown",
@@ -64,51 +66,75 @@ STANDALONE_ACTIONS = {
     "arm":       "lock_screen",
 }
 
-# special action updation
+# special action dict 
 SPECIAL_ACTIONS = {
     "open": "open_application",
     "close": "close_application"
 }
 
+##########################################################################################
+
+
 
 def command_parser(tokens: list) -> CommandIR:
     command_ir = CommandIR()    # resulting intermediate representation
 
-    action_found = False  # flag
-    target_found = False
-    verb_found = False
+    # flags for finding various parameters in the input command given
+    action_found = False        # technical action word (verb + target) found!
+    target_found = False        # target to be acted on found!
+    verb_found = False          # verb part of the action found
 
-    verb, target = None, None
+    verb, target = None, None       # currently, none
+    
+    for i, token in enumerate(tokens):
 
-    for i, token in enumerate(tokens): 
+        # for verb requiring no target
         if token in STANDALONE_ACTIONS:
             command_ir.action = STANDALONE_ACTIONS[token]
+            # everything found!
             action_found = True
             verb_found = True
             target_found = True
-            break
+            break   # no loop needed through rest of the token list
+
+
+
+        # for verbs requiring a target
         else:
+
+            # finding the verb
             if token in flattened_verb_dict:
                 verb = flattened_verb_dict[token]
                 verb_found = True
 
-                # open action command
-                if verb == 'open' or verb == 'close':
-                    if (i+1) < len(tokens):
+                # special action: a command needing a different action creation then 'verb + target'
+                # hence won't go through target-based creation
+                # case inside verb finding because synonyms may exist for these too
+                if verb in SPECIAL_ACTIONS:
+                    command_ir.action = SPECIAL_ACTIONS[verb]   # action found based on verb
+                    action_found = True
+
+                    # finding target for special action
+                    if (i+1) < len(tokens):     # for no out-of-bound condition
+                        # all the words after the special command are target
+                        # hence: target could be multi-words based
                         target = " ".join(tokens[i+1:])
                         target_found = True
+                    
+                    # no target defined for special action
                     else:
-                        command_ir.action = verb + "_application"
                         command_ir.errors.append("No target application provided!")
-                        return command_ir
-                    continue
+                        return command_ir   # no checking needed further ahead as partial command provided
 
-            if token in flattened_target_dict:
-                target = flattened_target_dict[token]
-                target_found = True
-            
-            if verb_found and target_found:
-                break
+        # checking for token
+        if token in flattened_target_dict and not target_found:
+            # not target_found: to stop over-writing special command's target
+            target = flattened_target_dict[token]
+            target_found = True
+
+        # breaking if both word and command found 
+        if verb_found and target_found:
+            break
     
     # error checking
     if not verb_found:
@@ -119,12 +145,10 @@ def command_parser(tokens: list) -> CommandIR:
         command_ir.errors.append("No target found!")
         return command_ir
 
-    # action & target creation (for non-standalone actions)
+    # action & target creation (for non-standalone & non-special actions)
     if not action_found:
-        if verb in SPECIAL_ACTIONS:
-            command_ir.action = SPECIAL_ACTIONS[verb]
-        else:
-            command_ir.action = verb + "_" + target
+        command_ir.action = verb + "_" + target
+    if target_found:
         command_ir.target = target
     
     # finding parameters, if any
@@ -132,7 +156,7 @@ def command_parser(tokens: list) -> CommandIR:
         if isinstance(token, int): # only for integers
             command_ir.parameters["level"] = token
 
-            # checking for 'minus' in words
+            # checking for 'minus' in words for numeric values found!
             if i > 0 and tokens[i-1] == "minus":
                 command_ir.parameters["level"] = 0 - token
 
