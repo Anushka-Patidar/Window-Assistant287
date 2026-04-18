@@ -379,8 +379,6 @@ URL_TARGETS = {
     "namecheap":            "https://www.namecheap.com",
 }
 
-# default browser
-DEFAULT_BROWSER = "chrome"
 
 # varied name resolution for application -> executable names
 APP_TARGETS = {
@@ -549,7 +547,7 @@ def validator(command_ir: CommandIR) -> CommandIR:
                 command_ir.parameters["level"] = 0
                 command_ir.warnings.append("Level provided less than 0. Set to 0.")
 
-    # checking application validness
+    # checking application validity
     target = command_ir.target
     if command_ir.action in APPLICATION_ACTIONS and target is not None:
         
@@ -558,15 +556,21 @@ def validator(command_ir: CommandIR) -> CommandIR:
             command_ir.target = APP_TARGETS[target]
             target = command_ir.target
 
-        # checking in system's application list
-        if shutil.which(target) is None:        # returns complete path or None (if doesn't exist)
-            if target in URL_TARGETS:       # target is a possible website
-                # open default browser
-                command_ir.target = DEFAULT_BROWSER
-                # open particular url in it
-                command_ir.parameters["url"] = URL_TARGETS[target]
-                command_ir.warnings.append("No such application on system. Opening in Browser!")
-            else:       # target not an application or a website: ERROR  
-                command_ir.errors.append("Target not found on the system!")
+            # creating target as url link as a fallback if application not installed
+            if target in URL_TARGETS:
+                command_ir.parameters["fallback_url"] = URL_TARGETS[target]
+                # open website (will be opened in whatever is the default browser)
+            else:
+                command_ir.parameters["fallback_url"] = None    # not a url
+
+        # if not, check for a url existence
+        elif target in URL_TARGETS:       # target is a possible website      
+                command_ir.target = URL_TARGETS[target]
+                # setting fallback url param as None since already in target
+                command_ir.parameters["fallback_url"] = None
+
+        # target not an application or a website: ERROR    
+        else:       
+            command_ir.errors.append("Target not found on the system!")
 
     return command_ir
