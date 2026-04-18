@@ -8,7 +8,8 @@ VERB_SYNONYMS = {
     "set":      ["set", "put", "make", "change", "adjust", "fix", "assign", "configure", "define", "update", "apply", "move", "go", "shift", "push"],
     "mute":     ["mute", "silence", "quiet", "hush", "suppress", "deafen", "drown", "block", "zero"],
     "open":     ["open", "launch", "start", "run", "execute", "load", "boot", "fire", "begin", "initiate", "activate", "bring", "pull", "access", "enter"],
-    "close":    ["close", "quit", "exit", "kill", "stop", "terminate", "shut", "end", "finish", "destroy", "remove", "collapse", "dismiss", "leave", "abandon"]
+    "close":    ["close", "quit", "exit", "kill", "stop", "terminate", "shut", "end", "finish", "destroy", "remove", "collapse", "dismiss", "leave", "abandon"],
+    "check":    ["check", "test", "measure", "diagnose", "verify", "inspect", "monitor", "analyze", "scan", "ping", "evaluate"],
 }
 
 # generating flattened lookup dictionary from VERB_SYNONYMS (faster access)
@@ -18,12 +19,14 @@ for key, synonyms_list in VERB_SYNONYMS.items():
     for synonym in synonyms_list:
         flattened_verb_dict[synonym] = key
 
+
 # target resolution table: technological word for target from many synonyms
 # target -> synonyms list
 TARGET_SYNONYMS = {
     "brightness": ["brightness", "bright", "screen", "display", "backlight", "luminance", "glow"],
     "volume":     ["volume", "sound", "audio", "noise", "speaker", "music"],
-    "zoom":       ["zoom", "scale", "magnification", "size"],
+    "internet":   ["internet", "wifi", "network", "connection", "connectivity", "speed", "bandwidth", "web", "signal", "net"],
+    "disk":       ["disk", "storage", "drive", "space", "memory", "hard drive", "harddrive", "ssd", "hdd", "c drive"],
 }
 
 # flattened dict: synonym -> target
@@ -39,6 +42,7 @@ STANDALONE_ACTIONS = {
     "poweroff":  "shutdown",
     "halt":      "shutdown",
     "power":     "shutdown",
+
     "restart":   "restart",
     "reboot":    "restart",
     "reset":     "restart",
@@ -51,6 +55,7 @@ STANDALONE_ACTIONS = {
     "bounce":    "restart",
     "redo":      "restart",
     "flip":      "restart",
+
     "lock":      "lock_screen",
     "secure":    "lock_screen",
     "protect":   "lock_screen",
@@ -64,6 +69,16 @@ STANDALONE_ACTIONS = {
     "pause":     "lock_screen",
     "engage":    "lock_screen",
     "arm":       "lock_screen",
+
+    "mute":      "mute",
+    "silence":   "mute",
+    "quiet":     "mute",
+    "hush":      "mute",
+    "suppress":  "mute",
+    "deafen":    "mute",
+    "drown":     "mute",
+    "block":     "mute",
+    "zero":      "mute",
 }
 
 # special action dict 

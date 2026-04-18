@@ -1,14 +1,15 @@
 from command_ir import CommandIR
-import shutil
 
 # actions involving the parameter: level
 LEVEL_ACTIONS = {
     "increase_brightness", "decrease_brightness", "set_brightness",
-    "increase_volume", "decrease_volume", "set_volume",
-    "increase_zoom", "decrease_zoom", "set_zoom"
+    "increase_volume", "decrease_volume", "set_volume"
 }
 
-
+INR_DCR_LEVEL_ACTIONS = {
+    "increase_brightness", "decrease_brightness",
+    "increase_volume", "decrease_volume"
+}
 
 # actions involving dealing with applications
 APPLICATION_ACTIONS = {
@@ -521,7 +522,6 @@ APP_TARGETS = {
 }
 
 
-
 def validator(command_ir: CommandIR) -> CommandIR:
 
     # validating 'level' parameter
@@ -529,13 +529,13 @@ def validator(command_ir: CommandIR) -> CommandIR:
         level = command_ir.parameters.get("level")      # safe getter: returns None if no such element found
 
         # level parameter doesn't exists: get("level") returned None
-        if level is None: 
+        if level is None and command_ir.action not in INR_DCR_LEVEL_ACTIONS: 
             # setting a default level 
             command_ir.parameters["level"] = 50
             command_ir.warnings.append("No level provided. Defaulted to 50.")
         
         # level parameter present!
-        else:
+        elif level is not None:
 
             # capping down level beyond 100
             if level > 100:
