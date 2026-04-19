@@ -8,6 +8,7 @@ import set_brightness
 import set_volume
 import check_internet
 import check_disk
+import mode_manager
 
 
 # maps action -> action's functions
@@ -29,10 +30,13 @@ dispatch = {
     "close_application":    close_application.close_application,
 
     "check_internet":       check_internet.check_internet,
-    "check_disk":     check_disk.check_disk,
+    "check_disk":           check_disk.check_disk,
     # "reminder":             reminder,
     # "create_video_call":    create_video_call,
-    # "group_open":           group_open,
+    "open_mode":            mode_manager.open_mode,
+    "close_mode":           mode_manager.close_mode,
+    "create_mode":          mode_manager.create_mode,
+    "delete_mode":          mode_manager.delete_mode
 }
 
 def execution(command_ir: CommandIR):

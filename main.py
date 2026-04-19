@@ -12,17 +12,14 @@ command = input("Enter your command: ")
 
 # input processing
 tokens = input_processor(command)
-print("Tokens generated: ", tokens)
 
 
 
 # parsing through the tokens and producing an intermediate representation
 ir = command_parser(tokens)
-print("The CommandIR:\n", ir)
 
 # validating the ir
 ir = validator(ir)
-print("Validated CommandIR is:", ir)
 
 
 
