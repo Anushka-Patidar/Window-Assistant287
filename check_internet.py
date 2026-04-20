@@ -13,5 +13,5 @@ def check_internet(ir:CommandIR):
     upload_speed_in_mbps = upload_speed_in_bits // (1024 * 1024)
 
     print("Internet Connectivity Check:")
-    print("Download Speed:", download_speed_in_mbps, "mbps")
-    print("Upload Speed:", upload_speed_in_mbps, "mbps")
+    print("Download Speed:", download_speed_in_mbps, "MBPS")
+    print("Upload Speed:", upload_speed_in_mbps, "MBPS")

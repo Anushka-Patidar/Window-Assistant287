@@ -3,26 +3,50 @@ import subprocess
 import time
 from command_ir import CommandIR
 
+
 def open_application(ir: CommandIR):
-    # target: either an application OR a url
-    if ir.parameters["fallback_url"] is None:
-        subprocess.Popen(["start", ir.target], shell=True)      # directly execute whatever is
+    target      = ir.target
+    fallback_url = ir.parameters.get("fallback_url")
+    force_web   = ir.parameters.get("force_web", False)
 
-        # NOTE: Start DOESN'T report whether such an application/website exists or not!
-        
-    else:       # target: could be both application and a url
-        # first, run the application
-        subprocess.Popen(["start", ir.target], shell=True)
+    # ── Case 1: User explicitly asked for browser/web ────────────────────────
+    if force_web:
+        if fallback_url:
+            subprocess.Popen(["start", "", fallback_url], shell=True)
+        else:
+            subprocess.Popen(["start", "", target], shell=True)
+        return
 
-        # next: check if it actually ran by
-        # checking whether such a process was created or not
-        time.sleep(2)       # wait for 2 seconds
+    # ── Case 2: Target is already a resolved URL ─────────────────────────────
+    if target.startswith("http"):
+        subprocess.Popen(["start", "", target], shell=True)
+        return
 
-        installed_application_ran = False   # flag
-        for process in psutil.process_iter(['name']):
-            if ir.target == process.info['name'].lower():
-                installed_application_ran = True
-        
-        # check for fallback_url execution
-        if not installed_application_ran:       # i.e.: no installed application ran
-            subprocess.Popen(["start", ir.parameters["fallback_url"]], shell=True)
+    # ── Case 3: App launch with no URL fallback ──────────────────────────────
+    if fallback_url is None:
+        subprocess.Popen(
+            ["start", "", target],
+            shell=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
+        return
+
+    # ── Case 4: App launch with URL fallback ─────────────────────────────────
+    subprocess.Popen(["start", "", target], shell=True)
+
+    # wait, then check whether the process actually appeared
+    time.sleep(2)
+
+    installed_application_ran = False
+    target_lower = target.lower().replace(".exe", "")
+
+    for process in psutil.process_iter(['name']):
+        process_name = process.info['name'].lower().replace(".exe", "")
+        if target_lower in process_name or process_name in target_lower:
+            installed_application_ran = True
+            break
+
+    if not installed_application_ran:
+        print(f"App '{target}' not found running. Opening in browser...")
+        subprocess.Popen(["start", "", fallback_url], shell=True)

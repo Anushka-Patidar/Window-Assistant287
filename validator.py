@@ -1,23 +1,32 @@
 from command_ir import CommandIR
 
-# actions involving the parameter: level
+
+# ─── Action Category Sets ─────────────────────────────────────────────────────
+
+# actions where a numeric 'level' parameter is relevant
 LEVEL_ACTIONS = {
     "increase_brightness", "decrease_brightness", "set_brightness",
-    "increase_volume", "decrease_volume", "set_volume"
+    "increase_volume",     "decrease_volume",     "set_volume",
 }
 
+# subset of LEVEL_ACTIONS where missing level is NOT an error (no default needed)
 INR_DCR_LEVEL_ACTIONS = {
     "increase_brightness", "decrease_brightness",
-    "increase_volume", "decrease_volume"
+    "increase_volume",     "decrease_volume",
 }
 
-# actions involving dealing with applications
+# actions that open or close a single application / website
 APPLICATION_ACTIONS = {
     "open_application",
-    "close_application"
+    "close_application",
 }
 
-# url sites to check for browser (when not in app_list of the system)
+
+# ─── URL Targets ─────────────────────────────────────────────────────────────
+# Maps user-friendly name → full URL.
+# Used when the target is a website rather than an installed app.
+# To add a new site: add one entry in the correct section below.
+
 URL_TARGETS = {
 
     # ── Search Engines ──────────────────────────────────────────────────────────
@@ -68,9 +77,16 @@ URL_TARGETS = {
     "vimeo":                "https://www.vimeo.com",
     "dailymotion":          "https://www.dailymotion.com",
     "curiositystream":      "https://www.curiositystream.com",
+    "crunchyroll":          "https://www.crunchyroll.com",
+    "funimation":           "https://www.funimation.com",
+    "peacock":              "https://www.peacocktv.com",
+    "hulu":                 "https://www.hulu.com",
+    "apple tv":             "https://tv.apple.com",
+    "paramount plus":       "https://www.paramountplus.com",
+    "discovery plus":       "https://www.discoveryplus.com",
 
     # ── Music ───────────────────────────────────────────────────────────────────
-    "spotify":              "https://www.spotify.com",
+    "spotify":              "https://open.spotify.com",
     "gaana":                "https://www.gaana.com",
     "jiosaavn":             "https://www.jiosaavn.com",
     "saavn":                "https://www.jiosaavn.com",
@@ -80,6 +96,8 @@ URL_TARGETS = {
     "apple music":          "https://music.apple.com",
     "youtube music":        "https://music.youtube.com",
     "amazon music":         "https://music.amazon.in",
+    "tidal":                "https://www.tidal.com",
+    "deezer":               "https://www.deezer.com",
 
     # ── Messaging ───────────────────────────────────────────────────────────────
     "whatsapp":             "https://web.whatsapp.com",
@@ -94,6 +112,8 @@ URL_TARGETS = {
     "zoom":                 "https://www.zoom.us",
     "google meet":          "https://meet.google.com",
     "meet":                 "https://meet.google.com",
+    "webex":                "https://www.webex.com",
+    "matrix":               "https://app.element.io",
 
     # ── Email ───────────────────────────────────────────────────────────────────
     "gmail":                "https://mail.google.com",
@@ -104,6 +124,8 @@ URL_TARGETS = {
     "tutanota":             "https://www.tutanota.com",
     "zoho mail":            "https://mail.zoho.in",
     "rediffmail":           "https://mail.rediff.com",
+    "fastmail":             "https://www.fastmail.com",
+    "icloud mail":          "https://www.icloud.com/mail",
 
     # ── Shopping ────────────────────────────────────────────────────────────────
     "amazon":               "https://www.amazon.in",
@@ -158,7 +180,6 @@ URL_TARGETS = {
     "indigo":               "https://www.goindigo.in",
     "air india":            "https://www.airindia.com",
     "spicejet":             "https://www.spicejet.com",
-    "vistara":              "https://www.airvistara.com",
 
     # ── Finance & Banking ───────────────────────────────────────────────────────
     "paytm":                "https://www.paytm.com",
@@ -186,10 +207,11 @@ URL_TARGETS = {
     "axis bank":            "https://www.axisbank.com",
     "kotak":                "https://www.kotak.com",
     "yes bank":             "https://www.yesbank.in",
-    "paytm bank":           "https://www.paytmbank.com",
     "fi money":             "https://fi.money",
     "jupiter":              "https://www.jupitermoney.com",
     "niyo":                 "https://www.goniyo.com",
+    "robinhood":            "https://www.robinhood.com",
+    "etoro":                "https://www.etoro.com",
 
     # ── News ────────────────────────────────────────────────────────────────────
     "times of india":       "https://timesofindia.indiatimes.com",
@@ -217,17 +239,16 @@ URL_TARGETS = {
     "firstpost":            "https://www.firstpost.com",
     "deccan herald":        "https://www.deccanherald.com",
     "indian express":       "https://indianexpress.com",
-    "dna":                  "https://www.dnaindia.com",
-    "tribune":              "https://www.tribuneindia.com",
-    "rediff":               "https://www.rediff.com",
+    "the guardian":         "https://www.theguardian.com",
+    "new york times":       "https://www.nytimes.com",
+    "nyt":                  "https://www.nytimes.com",
+    "washington post":      "https://www.washingtonpost.com",
     "cricbuzz":             "https://www.cricbuzz.com",
     "espncricinfo":         "https://www.espncricinfo.com",
     "cricinfo":             "https://www.espncricinfo.com",
-    "sports18":             "https://www.sports18.com",
 
     # ── Education ───────────────────────────────────────────────────────────────
     "wikipedia":            "https://www.wikipedia.org",
-    "byju's":               "https://www.byjus.com",
     "byjus":                "https://www.byjus.com",
     "unacademy":            "https://www.unacademy.com",
     "vedantu":              "https://www.vedantu.com",
@@ -243,9 +264,10 @@ URL_TARGETS = {
     "tutorialspoint":       "https://www.tutorialspoint.com",
     "nptel":                "https://www.nptel.ac.in",
     "swayam":               "https://www.swayam.gov.in",
-    "testbook":             "https://www.testbook.com",
-    "gradeup":              "https://www.gradeup.co",
-    "adda247":              "https://www.adda247.com",
+    "mit opencourseware":   "https://www.ocw.mit.edu",
+    "brilliant":            "https://www.brilliant.org",
+    "codecademy":           "https://www.codecademy.com",
+    "freecodecamp":         "https://www.freecodecamp.org",
 
     # ── Productivity & Cloud ─────────────────────────────────────────────────────
     "google drive":         "https://drive.google.com",
@@ -271,7 +293,12 @@ URL_TARGETS = {
     "monday":               "https://www.monday.com",
     "airtable":             "https://www.airtable.com",
     "evernote":             "https://www.evernote.com",
-    "obsidian":             "https://www.obsidian.md",
+    "obsidian":             "https://www.obsidian.md",      # web fallback for obsidian
+    "linear":               "https://www.linear.app",
+    "clickup":              "https://www.clickup.com",
+    "basecamp":             "https://www.basecamp.com",
+    "miro":                 "https://www.miro.com",
+    "loom":                 "https://www.loom.com",
 
     # ── AI Tools ────────────────────────────────────────────────────────────────
     "chatgpt":              "https://www.chatgpt.com",
@@ -284,6 +311,10 @@ URL_TARGETS = {
     "grammarly":            "https://www.grammarly.com",
     "deepl":                "https://www.deepl.com",
     "hugging face":         "https://www.huggingface.co",
+    "stable diffusion":     "https://stablediffusionweb.com",
+    "runway":               "https://www.runwayml.com",
+    "suno":                 "https://www.suno.ai",
+    "udio":                 "https://www.udio.com",
 
     # ── Developer Tools ─────────────────────────────────────────────────────────
     "github":               "https://www.github.com",
@@ -312,6 +343,15 @@ URL_TARGETS = {
     "cloudflare":           "https://www.cloudflare.com",
     "postman":              "https://www.postman.com",
     "figma":                "https://www.figma.com",
+    "bitbucket":            "https://www.bitbucket.org",
+    "jsfiddle":             "https://www.jsfiddle.net",
+    "codesandbox":          "https://codesandbox.io",
+    "stackblitz":           "https://stackblitz.com",
+    "render":               "https://www.render.com",
+    "railway":              "https://railway.app",
+    "supabase":             "https://supabase.com",
+    "firebase":             "https://firebase.google.com",
+    "mongodb atlas":        "https://www.mongodb.com/atlas",
 
     # ── Government ──────────────────────────────────────────────────────────────
     "digilocker":           "https://www.digilocker.gov.in",
@@ -322,7 +362,6 @@ URL_TARGETS = {
     "gst":                  "https://www.gst.gov.in",
     "epfo":                 "https://www.epfindia.gov.in",
     "passport":             "https://www.passportindia.gov.in",
-    "cowin":                "https://www.cowin.gov.in",
     "umang":                "https://web.umang.gov.in",
     "india gov":            "https://www.india.gov.in",
     "mca":                  "https://www.mca.gov.in",
@@ -335,9 +374,9 @@ URL_TARGETS = {
     "monster":              "https://www.monsterindia.com",
     "internshala":          "https://www.internshala.com",
     "instahyre":            "https://www.instahyre.com",
-    "hirist":               "https://www.hirist.tech",
     "wellfound":            "https://www.wellfound.com",
     "angel list":           "https://www.wellfound.com",
+    "glassdoor":            "https://www.glassdoor.co.in",
 
     # ── Health ──────────────────────────────────────────────────────────────────
     "practo":               "https://www.practo.com",
@@ -347,7 +386,6 @@ URL_TARGETS = {
     "apollo pharmacy":      "https://www.apollopharmacy.in",
     "healthkart":           "https://www.healthkart.com",
     "tata 1mg":             "https://www.1mg.com",
-    "docprime":             "https://www.docprime.com",
 
     # ── Maps & Local ────────────────────────────────────────────────────────────
     "google maps":          "https://maps.google.com",
@@ -356,8 +394,8 @@ URL_TARGETS = {
     "mapmy india":          "https://www.mapmyindia.com",
     "justdial":             "https://www.justdial.com",
     "sulekha":              "https://www.sulekha.com",
-    "urbanclap":            "https://www.urbancompany.com",
     "urban company":        "https://www.urbancompany.com",
+    "openstreetmap":        "https://www.openstreetmap.org",
 
     # ── Miscellaneous ───────────────────────────────────────────────────────────
     "wayback machine":      "https://web.archive.org",
@@ -369,7 +407,6 @@ URL_TARGETS = {
     "typeform":             "https://www.typeform.com",
     "surveymonkey":         "https://www.surveymonkey.com",
     "linktree":             "https://www.linktr.ee",
-    "bit ly":               "https://www.bit.ly",
     "medium":               "https://www.medium.com",
     "substack":             "https://www.substack.com",
     "wordpress":            "https://www.wordpress.com",
@@ -378,10 +415,22 @@ URL_TARGETS = {
     "squarespace":          "https://www.squarespace.com",
     "godaddy":              "https://www.godaddy.com",
     "namecheap":            "https://www.namecheap.com",
+    "producthunt":          "https://www.producthunt.com",
+    "hacker news":          "https://news.ycombinator.com",
+    "hn":                   "https://news.ycombinator.com",
+    "devto":                "https://www.dev.to",
+    "hashnode":             "https://www.hashnode.com",
+    "goodreads":            "https://www.goodreads.com",
+    "imdb":                 "https://www.imdb.com",
+    "letterboxd":           "https://www.letterboxd.com",
 }
 
 
-# varied name resolution for application -> executable names
+# ─── App Targets ─────────────────────────────────────────────────────────────
+# Maps user-friendly name → Windows executable name.
+# Used when the target is an installed application.
+# To add a new app: add one entry in the correct section below.
+
 APP_TARGETS = {
 
     # ── Browsers ────────────────────────────────────────────────────────────────
@@ -414,6 +463,8 @@ APP_TARGETS = {
     "notepad plus plus":    "notepad++",
     "atom":                 "atom",
     "cursor":               "cursor",
+    "windsurf":             "windsurf",
+    "zed":                  "zed",
 
     # ── Terminals ───────────────────────────────────────────────────────────────
     "terminal":             "wt",
@@ -439,6 +490,12 @@ APP_TARGETS = {
     "access":               "msaccess",
     "publisher":            "mspub",
 
+    # ── Notes & PKM ─────────────────────────────────────────────────────────────
+    "obsidian":             "obsidian",         # installed app — NOT a URL
+    "logseq":               "logseq",
+    "notion":               "notion",
+    "typora":               "typora",
+
     # ── Communication ───────────────────────────────────────────────────────────
     "discord":              "discord",
     "slack":                "slack",
@@ -459,6 +516,14 @@ APP_TARGETS = {
     "potplayer":            "potplayer",
     "obs":                  "obs64",
     "obs studio":           "obs64",
+    "foobar":               "foobar2000",
+    "foobar2000":           "foobar2000",
+    "audacity":             "audacity",
+    "handbrake":            "handbrake",
+    "kdenlive":             "kdenlive",
+    "davinci resolve":      "resolve",
+    "davinci":              "resolve",
+    "capcut":               "capcut",
 
     # ── System & Utilities ──────────────────────────────────────────────────────
     "notepad":              "notepad",
@@ -473,6 +538,11 @@ APP_TARGETS = {
     "device manager":       "devmgmt.msc",
     "disk management":      "diskmgmt.msc",
     "snipping tool":        "snippingtool",
+    "sticky notes":         "stikynot",
+    "clock":                "clock",
+    "settings":             "ms-settings:",
+    "windows settings":     "ms-settings:",
+    "windows defender":     "windowsdefender:",
 
     # ── Design & Creative ───────────────────────────────────────────────────────
     "photoshop":            "photoshop",
@@ -483,9 +553,12 @@ APP_TARGETS = {
     "adobe premiere":       "premiere",
     "after effects":        "afterfx",
     "adobe after effects":  "afterfx",
+    "lightroom":            "lightroom",
+    "adobe lightroom":      "lightroom",
     "figma":                "figma",
     "blender":              "blender",
     "gimp":                 "gimp-2",
+    "inkscape":             "inkscape",
 
     # ── File & Cloud ────────────────────────────────────────────────────────────
     "winrar":               "winrar",
@@ -493,6 +566,8 @@ APP_TARGETS = {
     "7-zip":                "7zfm",
     "dropbox":              "dropbox",
     "onedrive":             "onedrive",
+    "everything":           "everything",
+    "total commander":      "totalcmd",
 
     # ── Games & Gaming ──────────────────────────────────────────────────────────
     "steam":                "steam",
@@ -503,7 +578,8 @@ APP_TARGETS = {
     "battle.net":           "battle.net",
     "ubisoft connect":      "ubisoftconnect",
     "uplay":                "ubisoftconnect",
-    "gog galaxy":           "gog galaxy",
+    "gog galaxy":           "gogalaxy",
+    "xbox":                 "xboxapp",
 
     # ── Security & VPN ──────────────────────────────────────────────────────────
     "nordvpn":              "nordvpn",
@@ -511,6 +587,7 @@ APP_TARGETS = {
     "malwarebytes":         "malwarebytes",
     "avast":                "avast",
     "kaspersky":            "kaspersky",
+    "bitwarden":            "bitwarden",
 
     # ── Database Tools ──────────────────────────────────────────────────────────
     "postman":              "postman",
@@ -519,58 +596,66 @@ APP_TARGETS = {
     "mongodb compass":      "mongodbcompass",
     "dbeaver":              "dbeaver",
     "tableplus":            "tableplus",
+    "insomnia":             "insomnia",
+    "docker":               "docker desktop",
+    "docker desktop":       "docker desktop",
+
+    # ── Other Dev ───────────────────────────────────────────────────────────────
+    "filezilla":            "filezilla",
+    "putty":                "putty",
+    "winscp":               "winscp",
+    "virtualbox":           "virtualbox",
+    "vmware":               "vmware",
 }
 
 
+# ─── Validator Function ───────────────────────────────────────────────────────
+
 def validator(command_ir: CommandIR) -> CommandIR:
 
-    # validating 'level' parameter
+    # ── Level parameter validation ────────────────────────────────────────────
     if command_ir.action in LEVEL_ACTIONS:
-        level = command_ir.parameters.get("level")      # safe getter: returns None if no such element found
+        level = command_ir.parameters.get("level")
 
-        # level parameter doesn't exists: get("level") returned None
-        if level is None and command_ir.action not in INR_DCR_LEVEL_ACTIONS: 
-            # setting a default level 
+        if level is None and command_ir.action not in INR_DCR_LEVEL_ACTIONS:
             command_ir.parameters["level"] = 50
             command_ir.warnings.append("No level provided. Defaulted to 50.")
-        
-        # level parameter present!
-        elif level is not None:
 
-            # capping down level beyond 100
+        elif level is not None:
             if level > 100:
                 command_ir.parameters["level"] = 100
                 command_ir.warnings.append("Level provided greater than 100. Capped down to 100.")
-            
-            # if level less than 0, setting it to minimum == 0
             if level < 0:
                 command_ir.parameters["level"] = 0
                 command_ir.warnings.append("Level provided less than 0. Set to 0.")
 
-    # checking application validity
+    # ── Application target validation ─────────────────────────────────────────
     target = command_ir.target
     if command_ir.action in APPLICATION_ACTIONS and target is not None:
-        
-        # correcting the application name if not == executable name
-        if target in APP_TARGETS:
-            command_ir.target = APP_TARGETS[target]
-            target = command_ir.target
 
-            # creating target as url link as a fallback if application not installed
+        force_web = command_ir.parameters.get("force_web", False)
+
+        # force_web: skip installed-app lookup entirely, go straight to URL
+        if force_web:
             if target in URL_TARGETS:
                 command_ir.parameters["fallback_url"] = URL_TARGETS[target]
-                # open website (will be opened in whatever is the default browser)
             else:
-                command_ir.parameters["fallback_url"] = None    # not a url
+                command_ir.parameters["fallback_url"] = "https://www." + target + ".com"
+            return command_ir
 
-        # if not, check for a url existence
-        elif target in URL_TARGETS:       # target is a possible website      
-                command_ir.target = URL_TARGETS[target]
-                # setting fallback url param as None since already in target
-                command_ir.parameters["fallback_url"] = None
+        # normal flow: try installed app first
+        if target in APP_TARGETS:
+            command_ir.target = APP_TARGETS[target]
+            # use the ORIGINAL name for URL fallback lookup, not the resolved executable
+            command_ir.parameters["fallback_url"] = URL_TARGETS.get(target, None)
 
-        # target not an application or a website: ERROR    
-        else:       
-            command_ir.errors.append("Target not found on the system!")
+        # not an installed app — try as a website
+        elif target in URL_TARGETS:
+            command_ir.target = URL_TARGETS[target]
+            command_ir.parameters["fallback_url"] = None
+
+        # unknown target — pass as-is and attempt to open directly
+        else:
+            command_ir.parameters["fallback_url"] = None
 
     return command_ir

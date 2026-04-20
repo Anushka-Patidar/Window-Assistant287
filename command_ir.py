@@ -1,14 +1,12 @@
 from dataclasses import dataclass, field
 from typing import Optional
 
-@dataclass      # for no manual __init__ or __eq__ methods!
-class CommandIR:
-    action: Optional[str] = None        # value = either string or None
-    target: Optional[str] = None        # value = either string or None
-    parameters: dict = field(default_factory=dict)      # for a new dict for each command
-    
-    # ignorable but inform the user
-    warnings: list = field(default_factory=list)    # new list for each command
 
-    # fatal issues! inform and stop the program
-    errors: list = field(default_factory=list)  # new list for each command
+@dataclass      # eliminates need for manual __init__ or __eq__
+class CommandIR:
+    action:     Optional[str] = None                        # what to do -> will be 'str' or None
+    target:     Optional[str] = None                        # what entity to act on
+    parameters: dict          = field(default_factory=dict) # extra data needed for execution -> field creates new dict each time
+
+    warnings:   list          = field(default_factory=list) # non-fatal — inform but continue
+    errors:     list          = field(default_factory=list) # fatal     — inform and stop
