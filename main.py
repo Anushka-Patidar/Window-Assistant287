@@ -1,48 +1,72 @@
-import sys
+import threading
+import json
+
 from input_processor import input_processor
-from command_parser  import command_parser
-from validator       import validator
-from executor        import execution
+from command_parser import command_parser
+from validator import validator
+from executor import execution
+
+import shortcut_listener
+import voice_listener
+import reminder_manager
 
 
-# ─── Pipeline ────────────────────────────────────────────────────────────────
+# ─── LOAD USER SHORTCUTS ───
 
-command = input("Enter your command: ")
-
-tokens = input_processor(command)
-# DEBUG print("tokens:", tokens)
-
-# if no command provided
-if not tokens:
-    sys.exit("No Command Provided. Ending Execution!")
-
-ir     = command_parser(tokens)
-ir     = validator(ir)
+def load_shortcuts():
+    try:
+        with open("shortcuts.json", "r") as f:
+            return json.load(f)
+    except:
+        return {}
 
 
-# ─── Error Gate ──────────────────────────────────────────────────────────────
+# ─── COMMAND HANDLER ───
 
-if ir.errors:
-    if len(ir.errors) > 1:
-        print("Errors Encountered!")
-        for i, error in enumerate(ir.errors, start=1):
-            print(f"  {i}. {error}")
-    else:
-        print("Error Encountered:", ir.errors[0])
-    sys.exit("Ending the Execution!")
+def handle_command(command: str):
+    tokens = input_processor(command)
+    if not tokens:
+        return
 
+    ir = validator(command_parser(tokens))
 
-# ─── Warnings ────────────────────────────────────────────────────────────────
+    if ir.errors:
+        print(ir.errors)
+        return
 
-if ir.warnings:
-    if len(ir.warnings) > 1:
-        print("Warnings Encountered!")
-        for i, warning in enumerate(ir.warnings, start=1):
-            print(f"  {i}. {warning}")
-    else:
-        print("Warning Encountered:", ir.warnings[0])
+    execution(ir)
 
 
-# ─── Execution ───────────────────────────────────────────────────────────────
+# ─── START THREADS ───
 
-execution(ir)
+def start_background_services():
+
+    # Keyboard shortcuts
+    shortcuts = load_shortcuts()
+    t1 = threading.Thread(target=shortcut_listener.run_shortcuts, args=(shortcuts,), daemon=True)
+
+    # Voice
+    t2 = threading.Thread(target=voice_listener.run_voice, daemon=True)
+
+    # Reminders
+    t3 = threading.Thread(target=reminder_manager.run_reminders, daemon=True)
+
+    t1.start()
+    t2.start()
+    t3.start()
+
+
+# ─── MAIN LOOP ───
+
+def main():
+    start_background_services()
+
+    print("Isha Assistant Running...\n")
+
+    while True:
+        command = input(">>> ")
+        handle_command(command)
+
+
+if __name__ == "__main__":
+    main()

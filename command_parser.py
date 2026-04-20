@@ -25,6 +25,7 @@ VERB_SYNONYMS = {
                  "register", "store"],
     "delete":   ["delete", "remove", "destroy", "erase", "clear", "wipe", "drop",
                  "unregister"],
+    "remind":   ["remind", "schedule", "alert"]
 }
 
 # flattened: synonym → canonical verb  (built once at import time)
@@ -120,6 +121,7 @@ SPECIAL_ACTIONS = {
     "create": "create_mode",
     "delete": "delete_mode",
     "update": "update_mode",
+    "remind": "create_reminder"
 }
 
 # tokens that signal the user wants force-web opening (used in parameter pass)

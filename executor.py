@@ -8,6 +8,7 @@ import set_volume
 import check_internet
 import check_disk
 import mode_manager
+import reminder_manager
 
 
 # ─── Dispatch Table ───────────────────────────────────────────────────────────
@@ -45,6 +46,9 @@ dispatch = {
     "create_mode":          mode_manager.create_mode,
     "update_mode":          mode_manager.update_mode,
     "delete_mode":          mode_manager.delete_mode,
+
+    # ── Reminder ─────────────────────────────────────────────────────────────────
+    "create_reminder": reminder_manager.create_reminder,
 }
 
 
